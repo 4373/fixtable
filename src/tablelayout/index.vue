@@ -24,15 +24,18 @@
   .box{
     position: relative;
     border: 1px solid #eee;
-  border-radius: 10px;
+     border-radius: 10px;
   }
   .left-box{
     position: absolute;
     left: 0;
-    width: 100px;
     top: 0;
+    width: 125.6px;
     z-index: 6;
     background: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  .left-box-box{
     overflow: hidden;
   }
 
@@ -71,8 +74,6 @@
                 class="fixed-left">{{key + 1}}</td>
               <td th='商品'>
                 条码：{{item.goods_bar}}
-                <br v-if='key === 1'>
-                dfsd
               </td>
               <td th='类别'>{{item.classe_name}}</td>
               <td th='主石数/重'
@@ -142,7 +143,7 @@
 
 <script>
   import { goods } from '../data.js'
-
+  import { Both } from './both.js'
 
   export default {
     directives: {
@@ -154,15 +155,16 @@
           el.parentElement.insertBefore(box, el)
           box.appendChild(el)
 
-          
-
+         
+          // 固定表头
           const header = document.createElement('div')
           header.setAttribute('class', 'table-header')
           let table = document.createElement('table')
           table.setAttribute('class', 'table')
           table.appendChild(el.querySelector('.thead').cloneNode(true))
           header.appendChild(table)
-
+          
+          // 固定表尾
           const footer = document.createElement('div')
           footer.setAttribute('class', 'table-footer')
           table = document.createElement('table')
@@ -170,13 +172,29 @@
           table.appendChild(el.querySelector('.tfoot').cloneNode(true))
           footer.appendChild(table)
 
-
           box.insertBefore(header, el)
           box.appendChild(footer)
 
+          // 固定左
+          Both(box)
+          
+          let leftscroll = 0
+          let topscroll = 0
+
+          const out_header = document.querySelector('.table-header').querySelector('.table')
+          const out_footer =document.querySelector('.table-footer').querySelector('.table')
+          const out_left = document.querySelector('.left-box-box').querySelector('.table')
+
           el.addEventListener('scroll', (e) => {
-            document.querySelector('.table-header').querySelector('.table').style.transform = `translateX(-${el.scrollLeft}px)`
-            document.querySelector('.table-footer').querySelector('.table').style.transform = `translateX(-${el.scrollLeft}px)`
+            if(el.scrollLeft !== leftscroll) {
+              leftscroll = el.scrollLeft
+              out_header.style.transform = `translateX(-${el.scrollLeft}px)`
+              out_footer.style.transform = `translateX(-${el.scrollLeft}px)`
+            }
+            if(el.scrollTop !== topscroll) {
+              topscroll = el.scrollTop
+              out_left.style.transform = `translateY(-${el.scrollTop}px)`
+            }
           })
         },
       }
