@@ -30,14 +30,19 @@ export function Both(box) {
   body_box.appendChild(body_table)
   const body_table_body = document.createElement('tbody')
   body_table.appendChild(body_table_body)
-  body_table.setAttribute('class', 'table table-striped')
+  body_table.setAttribute('class', 'table table-striped table-hover')
 
   const tr_in_body =document.querySelector('.tbody').getElementsByTagName('tr')
   for(let i = 0; i < tr_in_body.length; i++) {
     const td = tr_in_body[i].getElementsByTagName('td')[0]
     const b_tr = document.createElement('tr')
-    console.log(td)
-    b_tr.innerHTML = td.outerHTML
+
+    // b_tr.innerHTML = td.outerHTML
+    const this_td = td.cloneNode(true)
+    this_td.style.height = Math.ceil(td.offsetHeight) + 'px'
+    td.style.height = Math.ceil(td.offsetHeight) + 'px'
+    b_tr.appendChild(this_td)
+
     body_table_body.appendChild(b_tr)
   }
   leftbox.appendChild(body_box)
