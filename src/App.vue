@@ -5,7 +5,8 @@
 </template>
 
 <script>
-import TableLayout from './tablelayout/index'
+// import TableLayout from './tablelayout/index'
+import TableLayout from './component/box'
 export default {
   name: 'app',
   data () {
