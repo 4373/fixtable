@@ -7,6 +7,7 @@
 <script>
 // import TableLayout from './tablelayout/index'
 import TableLayout from './component/box'
+// import TableLayout from './colgroup/index'
 export default {
   name: 'app',
   data () {

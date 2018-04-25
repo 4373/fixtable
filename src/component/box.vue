@@ -1,6 +1,6 @@
 <template>
     <div class="eee">
-      <input type="text" v-model='count'>
+      <input type="number" v-model='count'>
         <Table :height='300'>
             <thead class="thead" slot='thead'>
                 <tr>
@@ -26,8 +26,9 @@
                 :key='key'>
                 <td th='序号'
                   class="fixed-left">{{key + 1}}</td>
-                <td th='商品'  style="width: 300px">
+                <td th='商品' style="width: 300px">
                   条码：{{item.goods_bar}}
+                  <br v-if='key === 3'>re
                 </td>
                 <td th='类别'>{{item.classe_name}}</td>
                 <td th='主石数/重'
@@ -67,7 +68,7 @@
                 </td>
                 <td th='状态'>{{item.goods_state}}</td>
                 <td th='操作'
-                  class="fixed-right">编辑　删除</td>
+                  class="fixed-right"><span>编辑</span>　删除</td>
               </tr>
             </tbody>
             <tfoot slot='tfoot'>

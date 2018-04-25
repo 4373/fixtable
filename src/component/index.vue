@@ -1,32 +1,51 @@
 <style lang='less'>
-  
-  .box{
-    /* box-sizing: border-box; */
+  .box {
     position: relative;
     border: 1px solid #eee;
-     border-radius: 10px;
+    border-radius: 10px;
   }
-  .box .table{
+
+  .box .table {
     table-layout: fixed
   }
-  .head th,.foot td{
-    background: #eee;
+  .box td:first-of-type,.box th:first-of-type{
+    box-shadow: 6px 0px 4px -4px rgba(0, 0, 0, 0.3);
   }
-  .box th, .box td{
+  .box td:last-child,.box th:last-child{
+    box-shadow: -6px 0px 4px -4px rgba(0, 0, 0, 0.3);
+  }
+  th,
+  td {
+    background: white;
+  }
+
+  .foot td{
+    background: #eee
+  }
+
+  .box th,
+  .box td {
     width: 100px;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis
+    text-overflow: ellipsis;
   }
-  .head,.body,.foot{
+
+  .head,
+  .body,
+  .foot {
     width: 100%
   }
-  .head, .foot{
+
+  .head,
+  .foot {
     overflow: hidden;
   }
-  .body{
+
+  .body {
     overflow: auto;
   }
+
 </style>
 <template>
   <div class="box">
@@ -35,7 +54,8 @@
         <slot name='thead'></slot>
       </table>
     </div>
-    <div class="body" :style='{height: height + "px"}'>
+    <div class="body"
+      :style='{height: height + "px"}'>
       <table class="table table-hover table-striped">
         <slot name='tbody'></slot>
       </table>
@@ -54,7 +74,9 @@
       thead: null,
       tbody: null,
       tfoot: null,
-      tbodyBox: null
+      tbodyBox: null,
+      boxWidth: 0,
+      tableWidth: 0
     }),
     props: {
       data: Array,
@@ -63,46 +85,66 @@
     methods: {
       sameWidth() {
         const tr_in_tbody = this.tbody.getElementsByTagName('tr')
-        if(tr_in_tbody.length === 0) {
+        if (tr_in_tbody.length === 0) {
           const th_in_thead = this.thead.getElementsByTagName('tr')[0].getElementsByTagName('th')
           const td_in_tfoot = this.tfoot.getElementsByTagName('tr')[0].getElementsByTagName('td')
-          for(let i = 0; i < th_in_thead.length; i++) {
+          for (let i = 0; i < th_in_thead.length; i++) {
             td_in_tfoot[i].style.width = Math.ceil(th_in_thead[i].offsetWidth) + 'px'
           }
         } else {
           const td_in_body = tr_in_tbody[0].getElementsByTagName('td')
           const tr_in_thead = this.thead.getElementsByTagName('tr')
           const tr_in_tfoot = this.tfoot.getElementsByTagName('tr')
-          
-          for(let i = 0; i < td_in_body.length; i++) {
+
+          for (let i = 0; i < td_in_body.length; i++) {
             const width = Math.ceil(td_in_body[i].offsetWidth) + 'px'
             td_in_body[i].style.width = width
-            for(let j = 0; j < tr_in_thead.length; j++) { // 循环 thead 的tr
+            for (let j = 0; j < tr_in_thead.length; j++) { // 循环 thead 的tr
               const th = tr_in_thead[j].getElementsByTagName('th')
               th[i].style.width = width
             }
-            for(let j = 0; j < tr_in_tfoot.length; j++) { // 循环 thead 的tr
+            for (let j = 0; j < tr_in_tfoot.length; j++) { // 循环 thead 的tr
               const td = tr_in_tfoot[j].getElementsByTagName('td')
               td[i].style.width = width
             }
-          } 
+          }
         }
       },
       sameScrollIn() {
         let leftscroll = 0
         let topscroll = 0
         const out_header = document.querySelector('.head').querySelector('.table')
-        const out_footer =document.querySelector('.foot').querySelector('.table')
+        const out_footer = document.querySelector('.foot').querySelector('.table')
         this.tbodyBox.addEventListener('scroll', (e) => {
-          if(this.tbodyBox.scrollLeft !== leftscroll) {
-              leftscroll = this.tbodyBox.scrollLeft
-              out_header.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
-              out_footer.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
-            }
-            if(this.tbodyBox.scrollTop !== topscroll) {
-              topscroll = this.tbodyBox.scrollTop
-            }
+          if (this.tbodyBox.scrollLeft !== leftscroll) {
+            leftscroll = this.tbodyBox.scrollLeft
+            out_header.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
+            out_footer.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
+            this.fixed(this.tbodyBox.scrollLeft)
+          }
         })
+      },
+      fixed(x) {
+        const rx = -(this.tableWidth - this.boxWidth + 18) + x
+        const trInhead = this.thead.getElementsByTagName('tr')
+        for (let i = 0; i < trInhead.length; i++) {
+          const th = trInhead[i].getElementsByTagName('th')
+          th[0].style.transform = `translateX(${x}px)`
+          th[th.length-1].style.transform = `translateX(${rx}px)`
+        }
+        const trInFoot = this.tfoot.getElementsByTagName('tr')
+        for (let i = 0; i < trInFoot.length; i++) {
+          const td = trInFoot[i].getElementsByTagName('td')
+          td[0].style.transform = `translateX(${x}px)`
+          td[td.length-1].style.transform = `translateX(${rx}px)`
+        }
+        const trInBody = this.tbody.getElementsByTagName('tr')
+        for (let i = 0; i < trInBody.length; i++) {
+          const td = trInBody[i].getElementsByTagName('td')
+          td[0].style.transform = `translateX(${x}px)`
+          td[td.length-1].style.transform = `translateX(${rx}px)`
+        }
+
       }
     },
     mounted() {
@@ -113,6 +155,16 @@
       this.tfoot = document.querySelector('.foot').getElementsByTagName('tfoot')[0]
       this.sameWidth()
       this.sameScrollIn()
+      this.boxWidth = this.box.offsetWidth
+      this.tableWidth = this.tbody.offsetWidth
+      this.fixed(0)
+      window.addEventListener('resize', () => {
+        this.sameWidth()
+        this.boxWidth = this.box.offsetWidth
+        this.tableWidth = this.tbody.offsetWidth
+        this.fixed(0)
+      })
+      
     }
   }
 </script>
