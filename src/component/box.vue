@@ -25,7 +25,7 @@
                 <tr v-for='(item, key) in list'
                 :key='key'>
                 <td th='序号'
-                  class="fixed-left">{{key + 1}}</td>
+                  class="fixed-left" @click='del(key)'>{{key + 1}}</td>
                 <td th='商品' style="width: 300px">
                   条码：{{item.goods_bar}}
                   <br v-if='key === 3'>re
@@ -68,7 +68,7 @@
                 </td>
                 <td th='状态'>{{item.goods_state}}</td>
                 <td th='操作'
-                  class="fixed-right"><span>编辑</span>　删除</td>
+                  class="fixed-right" style="width: 200px"><span>编辑</span>　删除</td>
               </tr>
             </tbody>
             <tfoot slot='tfoot'>
@@ -114,6 +114,11 @@
           list.push(b)
         }
         return list
+      }
+    },
+    methods: {
+      del(k) {
+        console.log(k)
       }
     },
     components: {Table},

@@ -11,15 +11,16 @@
     table-layout: fixed
   }
   .box td:first-of-type,.box th:first-of-type{
-    box-shadow: 6px 0px 4px -4px rgba(0, 0, 0, 0.3);
+    box-shadow: 6px 0px 4px -4px rgba(0, 0, 0, 0.1);
   }
   .box td:last-child,.box th:last-child{
-    box-shadow: -6px 0px 4px -4px rgba(0, 0, 0, 0.3);
+    box-shadow: -6px 0px 4px -4px rgba(0, 0, 0, 0.1);
   }
   th,
   td {
     background: white;
     box-sizing: border-box;
+    font-size: 12px;
   }
 
   .foot td{
@@ -130,24 +131,25 @@
         })
       },
       fixed(x) {
-        const rx = -(this.tableWidth - this.boxWidth + 18) + x
+        const rx = -(this.tableWidth - this.boxWidth + 18 - 2) + x
+        const lx = x-2
         const haveScrollWidth = this.tableWidth - this.boxWidth > 10 ? 0 : 18
         const trInhead = this.thead.getElementsByTagName('tr')
         for (let i = 0; i < trInhead.length; i++) {
           const th = trInhead[i].getElementsByTagName('th')
-          th[0].style.transform = `translateX(${x}px)`
+          th[0].style.transform = `translateX(${lx}px)`
           th[th.length-1].style.transform = `translateX(${rx - haveScrollWidth}px)`
         }
         const trInFoot = this.tfoot.getElementsByTagName('tr')
         for (let i = 0; i < trInFoot.length; i++) {
           const td = trInFoot[i].getElementsByTagName('td')
-          td[0].style.transform = `translateX(${x}px)`
+          td[0].style.transform = `translateX(${lx}px)`
           td[td.length-1].style.transform = `translateX(${rx- haveScrollWidth}px)`
         }
         const trInBody = this.tbody.getElementsByTagName('tr')
         for (let i = 0; i < trInBody.length; i++) {
           const td = trInBody[i].getElementsByTagName('td')
-          td[0].style.transform = `translateX(${x}px)`
+          td[0].style.transform = `translateX(${lx}px)`
           td[td.length-1].style.transform = `translateX(${rx}px)`
         }
 
@@ -164,14 +166,17 @@
       this.boxWidth = this.box.offsetWidth
       this.tableWidth = this.tbody.offsetWidth
       this.fixed(0)
+      let timer = null
       window.addEventListener('resize', () => {
-      
-        this.sameWidth()
-        this.boxWidth = this.box.offsetWidth
-        this.tableWidth = this.tbody.offsetWidth
-        setTimeout(() => {
-          this.fixed(0)
-        })
+        clearTimeout(timer)
+        
+        timer = setTimeout(() => {
+          // this.sameWidth()
+        }, 100)
+        
+          this.boxWidth = this.box.offsetWidth
+          this.tableWidth = this.tbody.offsetWidth
+          this.fixed(this.tbodyBox.scrollLeft)
       })
       
     }
