@@ -1,4 +1,4 @@
-<style lang='less'>
+<style scoped>
   .box {
     position: relative;
     border: 1px solid #eee;
@@ -8,13 +8,14 @@
     border: 1px solid #eee
   }
   .box .table {
-    table-layout: fixed
+    table-layout: fixed;
+    position: relative;
   }
   .box td:first-of-type,.box th:first-of-type{
-    box-shadow: 6px 0px 4px -4px rgba(0, 0, 0, 0.1);
+    border-right: 2px solid #eee;
   }
   .box td:last-child,.box th:last-child{
-    box-shadow: -6px 0px 4px -4px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #eee;
   }
   th,
   td {
@@ -38,7 +39,7 @@
   .head,
   .body,
   .foot {
-    width: 100%
+    width: 100%;
   }
 
   .head,
@@ -54,17 +55,17 @@
 <template>
   <div class="box">
     <div class="head">
-      <table class="table">
+      <table class="table thead-table">
         <slot name='thead'></slot>
       </table>
     </div>
-    <div class="body"
+    <div class="body thead-body"
       :style='{height: height + "px"}'>
       <table class="table table-hover table-striped">
         <slot name='tbody'></slot>
       </table>
     </div>
-    <div class="foot">
+    <div class="foot thead-foot">
       <table class="table">
         <slot name='tfoot'></slot>
       </table>
@@ -80,11 +81,13 @@
       tfoot: null,
       tbodyBox: null,
       boxWidth: 0,
-      tableWidth: 0
+      tableWidth: 0,
+      isIE9: false
     }),
     props: {
       data: Array,
-      height: Number
+      height: Number,
+      fixed: Boolean
     },
     methods: {
       sameWidth() {
@@ -124,13 +127,19 @@
         this.tbodyBox.addEventListener('scroll', (e) => {
           if (this.tbodyBox.scrollLeft !== leftscroll) {
             leftscroll = this.tbodyBox.scrollLeft
-            out_header.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
-            out_footer.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
-            this.fixed(this.tbodyBox.scrollLeft)
+            if(this.isIE9) {
+              out_header.style.left = -this.tbodyBox.scrollLeft + 'px'
+              out_footer.style.left = -this.tbodyBox.scrollLeft + 'px'
+            } else {
+              out_header.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
+              out_footer.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
+            }
+            this.fixedBoth(this.tbodyBox.scrollLeft)
           }
         })
       },
-      fixed(x) {
+      fixedBoth(x) {
+        if(!this.fixed) return
         const rx = -(this.tableWidth - this.boxWidth + 18 - 2) + x
         const lx = x-2
         const haveScrollWidth = this.tableWidth - this.boxWidth > 10 ? 0 : 18
@@ -165,20 +174,15 @@
       this.sameScrollIn()
       this.boxWidth = this.box.offsetWidth
       this.tableWidth = this.tbody.offsetWidth
-      this.fixed(0)
-      let timer = null
-      window.addEventListener('resize', () => {
-        clearTimeout(timer)
-        
-        timer = setTimeout(() => {
-          // this.sameWidth()
-        }, 100)
-        
+      this.fixedBoth(0)
+      window.addEventListener('resize', () => {        
           this.boxWidth = this.box.offsetWidth
           this.tableWidth = this.tbody.offsetWidth
-          this.fixed(this.tbodyBox.scrollLeft)
+          this.fixedBoth(this.tbodyBox.scrollLeft)
       })
-      
+      const UA = window.navigator.userAgent.toLowerCase()
+      this.isIE9 = UA && UA.indexOf('msie 9.0') > 0
+      console.log(this.$slots)
     }
   }
 </script>

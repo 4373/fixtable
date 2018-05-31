@@ -1,15 +1,16 @@
 <template>
     <div class="eee">
       <input type="number" v-model='count'>
-        <Table :height='300'>
-            <thead class="thead" slot='thead'>
+      <input type="checkbox" v-model='show'>
+        <Table :height='300' :fixed='false'>
+            <thead slot='thead'>
                 <tr>
                   <th class="fixed-left">序号</th>
                   <th @click='count = count + 20'>商品</th>
                   <th>类别</th>
-                  <th v-show='show'>主石数/重</th>
-                  <th v-show='show'>辅石数/重</th>
-                  <th v-show='show'>成本</th>
+                  <th>主石数/重</th>
+                  <th>辅石数/重</th>
+                  <th>成本</th>
                   <th v-show='show'>销售价</th>
                   <th v-show='show'>仓位</th>
                   <th v-show='show'>件重</th>
@@ -18,7 +19,7 @@
                   <th>库龄</th>
                   <th>创建时间</th>
                   <th>状态</th>
-                  <th class="fixed-right">操作</th>
+                  <th>操作</th>
                 </tr>
             </thead>
             <tbody slot='tbody'>
@@ -31,14 +32,11 @@
                   <br v-if='key === 3'>re
                 </td>
                 <td th='类别'>{{item.classe_name}}</td>
-                <td th='主石数/重'
-                  v-show='show'>
+                <td th='主石数/重'>
                   {{item.goods_stone_number}}/{{item.goods_stone_weight}}</td>
-                <td th='辅石数/重'
-                  v-show='show'>
+                <td th='辅石数/重'>
                   {{item.goods_vstone_number}}/{{item.goods_vstone_weight}}</td>
-                <td th='成本'
-                  v-show='show'>
+                <td th='成本'>
                   {{item.goods_cost}}
                 </td>
                 <td th='销售价'
@@ -68,7 +66,7 @@
                 </td>
                 <td th='状态'>{{item.goods_state}}</td>
                 <td th='操作'
-                  class="fixed-right" style="width: 200px"><span>编辑</span>　删除</td>
+                   style="width: 200px"><span>编辑</span>　删除</td>
               </tr>
             </tbody>
             <tfoot slot='tfoot'>
@@ -77,9 +75,9 @@
                 <td class="fixed-left">总计</td>
                 <td>1</td>
                 <td>2</td>
-                <td v-show='show'>3</td>
-                <td v-show='show'>4</td>
-                <td v-show='show'>5</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
                 <td v-show='show'>6</td>
                 <td v-show='show'>7</td>
                 <td v-show='show'>8</td>
@@ -88,7 +86,7 @@
                 <td>11</td>
                 <td>12</td>
                 <td>13</td>
-                <td class="fixed-right">14</td>
+                <td>14</td>
               </tr>
             </tfoot>
         </Table>
