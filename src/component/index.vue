@@ -4,36 +4,35 @@
     border: 1px solid #eee;
     border-radius: 10px;
   }
-  th,.foot td{
-    border: 1px solid #eee
-  }
-  .box .table {
-    table-layout: fixed;
-    position: relative;
-  }
-  .box td:first-of-type,.box th:first-of-type{
-    border-right: 2px solid #eee;
-  }
-  .box td:last-child,.box th:last-child{
-    border-left: 3px solid #eee;
-  }
-  th,
-  td {
-    background: white;
-    box-sizing: border-box;
-    font-size: 12px;
+
+  th {
+    background: #f5f5f5!important
   }
 
-  .foot td{
+  .box .table {
+    position: relative;
+    /* border-collapse: collapse; */
+  }
+
+
+
+  th,
+  tfoot td{
+    box-sizing:border-box;
+  }
+
+  .foot td {
     background: #eee
   }
 
   .box th,
   .box td {
-    width: 100px;
+    font-size: 12px;
+    font-family:Arial, Helvetica, sans-serif;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    /* width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis; */
   }
 
   .head,
@@ -44,7 +43,10 @@
 
   .head,
   .foot {
-    overflow: hidden;
+    overflow: hidden;    
+  }
+  .head .table, .foot .table{
+    table-layout: fixed;
   }
 
   .body {
@@ -53,20 +55,24 @@
 
 </style>
 <template>
-  <div class="box">
-    <div class="head">
-      <table class="table thead-table">
+  <div class="box" ref='box'>
+    <div class="head" ref='headBox'>
+      <table class="table thead-table" ref='head'>
         <slot name='thead'></slot>
       </table>
     </div>
-    <div class="body thead-body"
-      :style='{height: height + "px"}'>
-      <table class="table table-hover table-striped">
-        <slot name='tbody'></slot>
+    <div class="body" :style='{height: height + "px"}' ref='bodyBox'>
+      <table class="table table-hover table-striped" ref='body'>
+        <div v-if='$slots.tbody === undefined || $slots.tbody[0].children.length === 0' style="padding: 100px 0;text-align: center;">
+          没有数据
+        </div>
+        <slot name='tbody'>
+
+        </slot>
       </table>
     </div>
-    <div class="foot thead-foot">
-      <table class="table">
+    <div class="foot" ref='footBox'>
+      <table class="table" ref='foot'>
         <slot name='tfoot'></slot>
       </table>
     </div>
@@ -75,13 +81,6 @@
 <script>
   export default {
     data: () => ({
-      box: null,
-      thead: null,
-      tbody: null,
-      tfoot: null,
-      tbodyBox: null,
-      boxWidth: 0,
-      tableWidth: 0,
       isIE9: false
     }),
     props: {
@@ -91,98 +90,107 @@
     },
     methods: {
       sameWidth() {
-        const tr_in_tbody = this.tbody.getElementsByTagName('tr')
-        if (tr_in_tbody.length === 0) {
-          const th_in_thead = this.thead.getElementsByTagName('tr')[0].getElementsByTagName('th')
-          const td_in_tfoot = this.tfoot.getElementsByTagName('tr')[0].getElementsByTagName('td')
-          const width = Math.ceil(this.boxWidth / th_in_thead.length) + 'px'
-          for (let i = 0; i < th_in_thead.length; i++) {
-            th_in_thead[i].style.width = width
-            td_in_tfoot[i].style.width = width
+        const trInTbody = this.$refs.body.getElementsByTagName('tr')
+        if (trInTbody.length > 0) { // 
+          const widthArr = [] // 自适应宽度
+          const bodyTd = trInTbody[0].getElementsByTagName('td') // 一列中的所有 td
+          for(let i = 0; i < bodyTd.length; i++) { // 获取自适应宽度
+            widthArr.push(bodyTd[i].offsetWidth)
           }
-        } else {
-          const td_in_body = tr_in_tbody[0].getElementsByTagName('td')
-          const tr_in_thead = this.thead.getElementsByTagName('tr')
-          const tr_in_tfoot = this.tfoot.getElementsByTagName('tr')
-
-          for (let i = 0; i < td_in_body.length; i++) {
-            const width = Math.ceil(td_in_body[i].offsetWidth) + 'px'
-            td_in_body[i].style.width = width
-            for (let j = 0; j < tr_in_thead.length; j++) { // 循环 thead 的tr
-              const th = tr_in_thead[j].getElementsByTagName('th')
-              th[i].style.width = width
+          // 同步head宽度。处理colspan
+          const headTr = this.$refs.head.getElementsByTagName('tr')
+          if(headTr.length > 0) {
+            const th = headTr[headTr.length - 1].getElementsByTagName('th') || []
+            let step = 0
+            for(let i = 0; i < th.length; i++) {
+              let col = th[i].getAttribute('colspan')
+              if(col !== null) {
+                th[i].style.width = widthArr.slice(step, step + col).reduce((sum, item) => sum + item) + (col-1)*2 + 'px'
+                step += +col
+              } else {
+                th[i].style.width = widthArr[step] + 'px'
+                step++
+              }
             }
-            for (let j = 0; j < tr_in_tfoot.length; j++) { // 循环 thead 的tr
-              const td = tr_in_tfoot[j].getElementsByTagName('td')
-              td[i].style.width = width
+          }
+          // 同步foot宽度。处理colspan
+          const footTr = this.$refs.foot.getElementsByTagName('tr')
+          if(footTr.length > 0) {
+            const td = footTr[0].getElementsByTagName('td') || []
+            let step = 0
+            for(let i = 0; i < td.length; i++) {
+              let col = td[i].getAttribute('colspan')
+              if(col !== null) {
+                td[i].style.width = widthArr.slice(step, step + col).reduce((sum, item) => sum + item) + (col-1)*2 + 'px'
+                step += +col
+              } else {
+                td[i].style.width = widthArr[step] + 'px'
+                step++
+              }
             }
           }
         }
       },
-      sameScrollIn() {
+      sameScroll() {
         let leftscroll = 0
-        let topscroll = 0
-        const out_header = document.querySelector('.head').querySelector('.table')
-        const out_footer = document.querySelector('.foot').querySelector('.table')
-        this.tbodyBox.addEventListener('scroll', (e) => {
-          if (this.tbodyBox.scrollLeft !== leftscroll) {
-            leftscroll = this.tbodyBox.scrollLeft
-            if(this.isIE9) {
-              out_header.style.left = -this.tbodyBox.scrollLeft + 'px'
-              out_footer.style.left = -this.tbodyBox.scrollLeft + 'px'
+        const out_header = this.$refs.headBox.querySelector('.table')
+        const out_footer = this.$refs.footBox.querySelector('.table')
+        this.$refs.bodyBox.addEventListener('scroll', (e) => {
+          if (this.$refs.bodyBox.scrollLeft !== leftscroll) { // 仅横向滚动
+            leftscroll = this.$refs.bodyBox.scrollLeft
+            if (this.isIE9) {
+              out_header.style.left = -leftscroll + 'px'
+              out_footer.style.left = -leftscroll + 'px'
             } else {
-              out_header.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
-              out_footer.style.transform = `translateX(-${this.tbodyBox.scrollLeft}px)`
+              out_header.style.transform = `translateX(-${leftscroll}px)`
+              out_footer.style.transform = `translateX(-${leftscroll}px)`
             }
-            this.fixedBoth(this.tbodyBox.scrollLeft)
+            this.fixedBoth(leftscroll)
           }
         })
       },
       fixedBoth(x) {
-        if(!this.fixed) return
+        if (!this.fixed) return
         const rx = -(this.tableWidth - this.boxWidth + 18 - 2) + x
-        const lx = x-2
+        const lx = x - 2
         const haveScrollWidth = this.tableWidth - this.boxWidth > 10 ? 0 : 18
         const trInhead = this.thead.getElementsByTagName('tr')
         for (let i = 0; i < trInhead.length; i++) {
           const th = trInhead[i].getElementsByTagName('th')
           th[0].style.transform = `translateX(${lx}px)`
-          th[th.length-1].style.transform = `translateX(${rx - haveScrollWidth}px)`
+          th[th.length - 1].style.transform = `translateX(${rx - haveScrollWidth}px)`
         }
         const trInFoot = this.tfoot.getElementsByTagName('tr')
         for (let i = 0; i < trInFoot.length; i++) {
           const td = trInFoot[i].getElementsByTagName('td')
           td[0].style.transform = `translateX(${lx}px)`
-          td[td.length-1].style.transform = `translateX(${rx- haveScrollWidth}px)`
+          td[td.length - 1].style.transform = `translateX(${rx - haveScrollWidth}px)`
         }
         const trInBody = this.tbody.getElementsByTagName('tr')
         for (let i = 0; i < trInBody.length; i++) {
           const td = trInBody[i].getElementsByTagName('td')
           td[0].style.transform = `translateX(${lx}px)`
-          td[td.length-1].style.transform = `translateX(${rx}px)`
+          td[td.length - 1].style.transform = `translateX(${rx}px)`
         }
 
       }
     },
-    mounted() {
-      this.box = document.querySelector('.box')
-      this.thead = document.querySelector('.head').getElementsByTagName('thead')[0]
-      this.tbodyBox = document.querySelector('.body')
-      this.tbody = this.tbodyBox.getElementsByTagName('tbody')[0]
-      this.tfoot = document.querySelector('.foot').getElementsByTagName('tfoot')[0]
+    updated() {
       this.sameWidth()
-      this.sameScrollIn()
-      this.boxWidth = this.box.offsetWidth
-      this.tableWidth = this.tbody.offsetWidth
+      this.sameScroll()
+    },
+    mounted() {
+
+      this.sameWidth()
+      this.sameScroll()
+
       this.fixedBoth(0)
-      window.addEventListener('resize', () => {        
-          this.boxWidth = this.box.offsetWidth
-          this.tableWidth = this.tbody.offsetWidth
-          this.fixedBoth(this.tbodyBox.scrollLeft)
+      window.addEventListener('resize', () => {
+        this.sameWidth()
+        this.sameScroll()
       })
       const UA = window.navigator.userAgent.toLowerCase()
       this.isIE9 = UA && UA.indexOf('msie 9.0') > 0
-      console.log(this.$slots)
     }
   }
 </script>

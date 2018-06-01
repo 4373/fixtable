@@ -5,9 +5,8 @@
         <Table :height='300' :fixed='false'>
             <thead slot='thead'>
                 <tr>
-                  <th class="fixed-left">序号</th>
-                  <th @click='count = count + 20'>商品</th>
-                  <th>类别</th>
+                  <th colspan="3">序号</th>
+
                   <th>主石数/重</th>
                   <th>辅石数/重</th>
                   <th>成本</th>
@@ -18,16 +17,16 @@
                   <th>品牌</th>
                   <th>库龄</th>
                   <th>创建时间</th>
-                  <th>状态</th>
-                  <th>操作</th>
+                  <th colspan="2">状态</th>
+                  <!-- <th>操作</th> -->
                 </tr>
             </thead>
             <tbody slot='tbody'>
                 <tr v-for='(item, key) in list'
                 :key='key'>
                 <td th='序号'
-                  class="fixed-left" @click='del(key)'>{{key + 1}}</td>
-                <td th='商品' style="width: 300px">
+                  @click='del(key)'>{{key + 1}}</td>
+                <td th='商品' style="width: 120px">
                   条码：{{item.goods_bar}}
                   <br v-if='key === 3'>re
                 </td>
@@ -72,7 +71,7 @@
             <tfoot slot='tfoot'>
                 <tr v-for='(item, key) in 2'
                 :key='key'>
-                <td class="fixed-left">总计</td>
+                <td>总计</td>
                 <td>1</td>
                 <td>2</td>
                 <td>3</td>
@@ -90,6 +89,77 @@
               </tr>
             </tfoot>
         </Table>
+        <table class="table" style="margin-top: 30px;">
+          <thead>
+            <tr>
+                <th colspan="3" rowspan="2">序号</th>
+                <th>主石数/重</th>
+                <th>辅石数/重</th>
+                <th>成本</th>
+                <th>销售价</th>
+                <th>仓位</th>
+                <th>件重</th>
+                <th>金重</th>
+                <th>品牌</th>
+                <th>库龄</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            <tr>
+                <th>主石数/重</th>
+                <th>辅石数/重</th>
+                <th>成本</th>
+                <th>销售价</th>
+                <th>仓位</th>
+                <th>件重</th>
+                <th>金重</th>
+                <th>品牌</th>
+                <th>库龄</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr v-for = '(item, key) in 6' :key='key'>
+                  <td colspan="3">序号</td>
+                  <td>商品</td>
+                  <td>类别</td>
+                  <td>主石数/重</td>
+                  <td>辅石数/重</td>
+                  <td>成本</td>
+                  <td>销售价</td>
+                  <td>仓位</td>
+                  <td>件重</td>
+                  <td>金重</td>
+                  <td>品牌</td>
+                  <td>库龄</td>
+                  <td>创建时间</td>
+                  <td>状态</td>
+                  <td>操作</td>
+              </tr>
+          </tbody>
+          <tfoot>
+              <tr>
+                  <td colspan="5">序号</td>
+                  <td>商品</td>
+                  <td>类别</td>
+                  <td>主石数/重</td>
+                  <td>辅石数/重</td>
+                  <td>成本</td>
+                  <td>销售价</td>
+                  <td>仓位</td>
+                  <td>件重</td>
+                  <td>金重</td>
+                  <td>品牌</td>
+                  <td>库龄</td>
+                  <td>创建时间</td>
+                  <td>状态</td>
+                  <td>操作</td>
+              </tr>
+          </tfoot>
+        </table>
     </div>
   </template>
   
@@ -125,7 +195,7 @@
   
   <style lang="less">
     #app{
-      width: 80%;
+      width: 60%;
       margin: 100px auto
     }
   </style>
