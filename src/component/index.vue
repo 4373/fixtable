@@ -4,11 +4,6 @@
     border: 1px solid #eee;
     border-radius: 10px;
   }
-
-  th {
-    background: #f5f5f5!important
-  }
-
   .box .table {
     position: relative;
     /* border-collapse: collapse; */
@@ -21,15 +16,15 @@
     box-sizing:border-box;
   }
 
-  .foot td {
-    background: #eee
-  }
+
 
   .box th,
   .box td {
     font-size: 12px;
     font-family:Arial, Helvetica, sans-serif;
+    font-family: '微软雅黑';
     overflow: hidden;
+    min-width: 100px;
     /* width: 100px;
     overflow: hidden;
     text-overflow: ellipsis; */
@@ -43,15 +38,21 @@
 
   .head,
   .foot {
-    overflow: hidden;    
+    overflow: hidden;
+  }
+  .body {
+    overflow: auto;
   }
   .head .table, .foot .table{
     table-layout: fixed;
   }
-
-  .body {
-    overflow: auto;
+  .foot td{
+    background: #eee;
+    padding-top: 10px; 
+    padding-bottom: 10px; 
   }
+
+  
 
 </style>
 <template>
@@ -63,7 +64,7 @@
     </div>
     <div class="body" :style='{height: height + "px"}' ref='bodyBox'>
       <table class="table table-hover table-striped" ref='body'>
-        <div v-if='$slots.tbody === undefined || $slots.tbody[0].children.length === 0' style="padding: 100px 0;text-align: center;">
+        <div v-if='$slots.tbody === undefined || ($slots.tbody[0].children &&  $slots.tbody[0].children.length === 0)' style="padding: 100px 0;text-align: center;">
           没有数据
         </div>
         <slot name='tbody'>
@@ -73,7 +74,8 @@
     </div>
     <div class="foot" ref='footBox'>
       <table class="table" ref='foot'>
-        <slot name='tfoot'></slot>
+        <slot name='tfoot'>
+        </slot>
       </table>
     </div>
   </div>
@@ -84,8 +86,10 @@
       isIE9: false
     }),
     props: {
-      data: Array,
-      height: Number,
+      height: {
+        type: Number,
+        default: 366
+      },
       fixed: Boolean
     },
     methods: {
@@ -145,7 +149,6 @@
               out_header.style.transform = `translateX(-${leftscroll}px)`
               out_footer.style.transform = `translateX(-${leftscroll}px)`
             }
-            this.fixedBoth(leftscroll)
           }
         })
       },
@@ -184,7 +187,6 @@
       this.sameWidth()
       this.sameScroll()
 
-      this.fixedBoth(0)
       window.addEventListener('resize', () => {
         this.sameWidth()
         this.sameScroll()

@@ -68,26 +68,7 @@
                    style="width: 200px"><span>编辑</span>　删除</td>
               </tr>
             </tbody>
-            <tfoot slot='tfoot'>
-                <tr v-for='(item, key) in 2'
-                :key='key'>
-                <td>总计</td>
-                <td>1</td>
-                <td>2</td>
-                <td>3</td>
-                <td>4</td>
-                <td>5</td>
-                <td v-show='show'>6</td>
-                <td v-show='show'>7</td>
-                <td v-show='show'>8</td>
-                <td v-show='show'>9</td>
-                <td>10</td>
-                <td>11</td>
-                <td>12</td>
-                <td>13</td>
-                <td>14</td>
-              </tr>
-            </tfoot>
+
         </Table>
         <table class="table" style="margin-top: 30px;">
           <thead>
